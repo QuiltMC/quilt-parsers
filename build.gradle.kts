@@ -23,16 +23,13 @@ subprojects {
     java {
         withSourcesJar()
         withJavadocJar()
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+
+
         toolchain {
             languageVersion.set(JavaLanguageVersion.of(17))
         }
     }
 
-    tasks.compileJava {
-        options.release.set(8)
-    }
 
     license {
         rule(rootProject.file("codeformat/GSON_MODIFIED_HEADER"))

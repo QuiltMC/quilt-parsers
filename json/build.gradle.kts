@@ -11,6 +11,13 @@ repositories {
     mavenCentral()
 }
 
+tasks.compileJava {
+    options.release.set(8)
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
 dependencies {
     implementation("org.jetbrains:annotations:24.0.1")
 }
