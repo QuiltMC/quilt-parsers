@@ -24,7 +24,6 @@ subprojects {
         withSourcesJar()
         withJavadocJar()
 
-
         toolchain {
             languageVersion.set(JavaLanguageVersion.of(17))
         }
@@ -94,7 +93,7 @@ subprojects {
     signing {
         val key = env["SIGNING_KEY"]
         val pass = env["SIGNING_KEY_PASSPHRASE"]
-        if (key != null && pass != null) {
+        if (key != null && pass != null && key != "" && pass != "") {
             useInMemoryPgpKeys(key, pass)
             sign(publishing.publications["mavenJava"])
         }
