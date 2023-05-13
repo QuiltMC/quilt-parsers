@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "org.quiltmc"
-version = "0.1.0"
+version = "0.2.0"
 
 repositories {
     mavenCentral()
@@ -28,7 +28,6 @@ subprojects {
             languageVersion.set(JavaLanguageVersion.of(17))
         }
     }
-
 
     license {
         rule(rootProject.file("codeformat/GSON_MODIFIED_HEADER"))

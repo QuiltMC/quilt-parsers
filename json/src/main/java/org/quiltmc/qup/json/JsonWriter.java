@@ -166,6 +166,7 @@ public final class JsonWriter implements Closeable, Flushable {
 
 	/** The output data, containing at most one top-level array or object. */
 	private final Writer out;
+	private final JsonFormat format;
 
 	private int[] stack = new int[32];
 	private int stackSize = 0;
@@ -190,7 +191,6 @@ public final class JsonWriter implements Closeable, Flushable {
 
 	private String deferredComment;
 	boolean inlineWaited = false;
-	private boolean strict = false;
 
 	private boolean compact = false;
 
@@ -202,7 +202,7 @@ public final class JsonWriter implements Closeable, Flushable {
 	 * Creates a new instance that writes a JSON5-encoded stream.
 	 */
 	public static JsonWriter json5(Path out) throws IOException {
-		return json5(Files.newBufferedWriter(Objects.requireNonNull(out, "Path cannot be null")));
+		return create(out, JsonFormat.JSON5);
 	}
 
 	/**
@@ -211,7 +211,7 @@ public final class JsonWriter implements Closeable, Flushable {
 	 * {@link BufferedWriter BufferedWriter} if necessary.
 	 */
 	public static JsonWriter json5(Writer out) {
-		return new JsonWriter(out);
+		return create(out, JsonFormat.JSON5);
 	}
 
 	/**
@@ -219,7 +219,7 @@ public final class JsonWriter implements Closeable, Flushable {
 	 * This disables NaN, (+/-)Infinity, and comments, and enables quotes around keys.
 	 */
 	public static JsonWriter json(Path out) throws IOException {
-		return json5(out).setStrictJson();
+		return create(out, JsonFormat.JSON);
 	}
 
 	/**
@@ -229,14 +229,40 @@ public final class JsonWriter implements Closeable, Flushable {
 	 * {@link BufferedWriter BufferedWriter} if necessary.
 	 */
 	public static JsonWriter json(Writer out) {
-		return json5(out).setStrictJson();
+		return create(out, JsonFormat.JSON);
 	}
 
-	private JsonWriter(Writer out) {
-		if (out == null) {
-			throw new NullPointerException("out == null");
-		}
+
+	/**
+	 * Creates a new instance that writes a strictly JSON-encoded stream.
+	 * This disables NaN and (+/-)Infinity and enables quotes around keys, but still emits comments.
+	 */
+	public static JsonWriter jsonc(Path out) throws IOException {
+		return create(out, JsonFormat.JSONC);
+	}
+
+	/**
+	 * Creates a new instance that writes a strictly JSON-encoded stream to {@code out}.
+	 * This disables NaN and (+/-)Infinity and enables quotes around keys, but still emits comments.
+	 * For best performance, ensure {@link Writer} is buffered; wrapping in
+	 * {@link BufferedWriter BufferedWriter} if necessary.
+	 */
+	public static JsonWriter jsonc(Writer out) {
+		return create(out, JsonFormat.JSONC);
+	}
+
+	public static JsonWriter create(Path out, JsonFormat format) throws IOException {
+		return new JsonWriter(Files.newBufferedWriter(Objects.requireNonNull(out, "Path cannot be null")), format);
+	}
+
+	public static JsonWriter create(Writer out, JsonFormat format) {
+		return new JsonWriter(out, format);
+	}
+
+	private JsonWriter(Writer out, JsonFormat format) {
+		Objects.requireNonNull(out, "Writer cannot be null");
 		this.out = out;
+		this.format = format;
 	}
 
 	/**
@@ -259,20 +285,6 @@ public final class JsonWriter implements Closeable, Flushable {
 		}
 	}
 
-	/**
-	 * Configure if the output must be strict JSON, instead of strict JSON5. This flag disables NaN, (+/-)Infinity, comments, and enables quotes around keys.
-	 */
-	public JsonWriter setStrictJson() {
-		this.strict = true;
-		return this;
-	}
-
-	/**
-	 * Returns true if the output must be strict JSON, instead of strict JSON5. The default is false.
-	 */
-	public boolean isStrictJson() {
-		return strict;
-	}
 
 	/**
 	 * Shortcut for {@code setIndent("")} that makes the encoded document significantly more compact.
@@ -441,7 +453,7 @@ public final class JsonWriter implements Closeable, Flushable {
 
 		writeDeferredName();
 		String string = value.toString();
-		if (strict && (string.equals("-Infinity") || string.equals("Infinity") || string.equals("NaN"))) {
+		if (format != JsonFormat.JSON5 && (string.equals("-Infinity") || string.equals("Infinity") || string.equals("NaN"))) {
 			throw new IllegalArgumentException("Numeric values must be finite, but was " + value);
 		}
 		beforeValue();
@@ -458,7 +470,7 @@ public final class JsonWriter implements Closeable, Flushable {
 	 */
 	public JsonWriter value(double value) throws IOException {
 		writeDeferredName();
-		if (strict && (Double.isNaN(value) || Double.isInfinite(value))) {
+		if (format != JsonFormat.JSON5 && (Double.isNaN(value) || Double.isInfinite(value))) {
 			throw new IllegalArgumentException("Numeric values must be finite, but was " + value);
 		}
 		beforeValue();
@@ -520,7 +532,7 @@ public final class JsonWriter implements Closeable, Flushable {
 	 * @param comment the comment to write, or null to encode nothing.
 	 */
 	public JsonWriter comment(String comment) throws IOException {
-		if (compact || strict || comment == null) {
+		if (compact || format == JsonFormat.JSON || comment == null) {
 			return this;
 		}
 
@@ -637,7 +649,7 @@ public final class JsonWriter implements Closeable, Flushable {
 		if (deferredName != null) {
 			beforeName();
 			boolean quotes = true;
-			if (!strict) {
+			if (format == JsonFormat.JSON5) {
 				// JSON5 allows bare names... only for keys that are valid EMCA5 identifiers
 				// luckily, Java identifiers follow the same standard,
 				//  so we can just use the built-in Character.isJavaIdentifierStart/Part methods
