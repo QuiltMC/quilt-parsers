@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.quiltmc.qup.json.gson;
+package org.quiltmc.parsers.json.gson;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
@@ -23,20 +23,20 @@ import java.io.IOException;
 import java.io.Reader;
 
 /**
- * Adapts a QUP {@link org.quiltmc.qup.json.JsonReader} to be used with {@link com.google.gson.Gson}
+ * Adapts a quilt-parsers' {@link org.quiltmc.parsers.json.JsonReader} to be used with {@link com.google.gson.Gson}
  */
 public class GsonReader extends JsonReader {
-    private final org.quiltmc.qup.json.JsonReader delegate;
+    private final org.quiltmc.parsers.json.JsonReader delegate;
     /**
      * Creates a new instance that reads a JSON-encoded stream from {@code in}.
      *
      */
-    public GsonReader(org.quiltmc.qup.json.JsonReader reader) {
+    public GsonReader(org.quiltmc.parsers.json.JsonReader reader) {
         super(Reader.nullReader());
         this.delegate = reader;
     }
 
-    public org.quiltmc.qup.json.JsonReader getDelegate() {
+    public org.quiltmc.parsers.json.JsonReader getDelegate() {
         return delegate;
     }
 

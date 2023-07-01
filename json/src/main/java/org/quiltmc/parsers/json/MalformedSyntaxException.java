@@ -14,38 +14,41 @@
  * limitations under the License.
  */
 
-package org.quiltmc.qup.json;
+package org.quiltmc.parsers.json;
 
-public class FormatViolationException extends ParseException {
-	public FormatViolationException() {
+/**
+ * An exception to be thrown by a parser when the syntax of a file is invalid.
+ */
+public class MalformedSyntaxException extends ParseException {
+	public MalformedSyntaxException() {
 		super();
 	}
 
-	public FormatViolationException(String message) {
+	public MalformedSyntaxException(String message) {
 		super(message);
 	}
 
-	public FormatViolationException(Throwable cause) {
+	public MalformedSyntaxException(Throwable cause) {
 		super(cause);
 	}
 
-	public FormatViolationException(String message, Throwable cause) {
+	public MalformedSyntaxException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public FormatViolationException(JsonReader reader) {
-		super(reader, "Format violation");
+	public MalformedSyntaxException(JsonReader reader) {
+		super(reader, "Malformed syntax");
 	}
 
-	public FormatViolationException(JsonReader reader, String message) {
+	public MalformedSyntaxException(JsonReader reader, String message) {
 		super(reader, message);
 	}
 
-	public FormatViolationException(JsonReader reader, Throwable cause) {
-		super(reader, "Format violation", cause);
+	public MalformedSyntaxException(JsonReader reader, Throwable cause) {
+		super(reader, "Malformed syntax", cause);
 	}
 
-	public FormatViolationException(JsonReader reader, String message, Throwable cause) {
+	public MalformedSyntaxException(JsonReader reader, String message, Throwable cause) {
 		super(reader, message, cause);
 	}
 }

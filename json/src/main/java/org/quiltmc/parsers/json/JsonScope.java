@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.quiltmc.qup.json;
+package org.quiltmc.parsers.json;
 
 /*
  * This is a carbon-copy of Gson's JsonScope.

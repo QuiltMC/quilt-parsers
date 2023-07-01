@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.quiltmc.qup.json;
+package org.quiltmc.parsers.json;
 
 /**
  * A generic exception relating to an error in parsing, from loading the text to be read to emitting it's final representation.

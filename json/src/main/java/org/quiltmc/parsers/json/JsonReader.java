@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.quiltmc.qup.json;
+package org.quiltmc.parsers.json;
 
 import java.io.*;
 import java.math.BigDecimal;

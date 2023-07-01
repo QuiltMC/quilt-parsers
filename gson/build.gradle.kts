@@ -5,7 +5,7 @@ plugins {
 
 group = rootProject.group.toString() + "." + rootProject.name
 version = rootProject.version
-description = "An adapter of QUP's JSON readers and writers to GSON"
+description = "An adapter of quilt-parsers' JSON readers and writers to GSON"
 repositories {
     mavenCentral()
 }

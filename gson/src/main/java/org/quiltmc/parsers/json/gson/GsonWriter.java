@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.quiltmc.qup.json.gson;
+package org.quiltmc.parsers.json.gson;
 
 import com.google.gson.stream.JsonWriter;
 
@@ -22,17 +22,17 @@ import java.io.IOException;
 import java.io.Writer;
 
 /**
- * Adapts a QUP {@link org.quiltmc.qup.json.JsonWriter} to be used with {@link com.google.gson.Gson}
+ * Adapts a quilt-parsers' {@link org.quiltmc.parsers.json.JsonWriter} to be used with {@link com.google.gson.Gson}
  */
 public class GsonWriter extends JsonWriter {
-    private final org.quiltmc.qup.json.JsonWriter delegate;
+    private final org.quiltmc.parsers.json.JsonWriter delegate;
 
-    public GsonWriter(org.quiltmc.qup.json.JsonWriter writer) {
+    public GsonWriter(org.quiltmc.parsers.json.JsonWriter writer) {
         super(Writer.nullWriter());
         this.delegate = writer;
     }
 
-    public org.quiltmc.qup.json.JsonWriter getDelegate() {
+    public org.quiltmc.parsers.json.JsonWriter getDelegate() {
         return delegate;
     }
 

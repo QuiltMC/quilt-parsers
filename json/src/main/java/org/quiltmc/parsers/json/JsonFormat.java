@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.quiltmc.qup.json;
+package org.quiltmc.parsers.json;
 
 /**
  * The JSON-family format to be used during parsing or writing.

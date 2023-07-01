@@ -43,15 +43,15 @@ subprojects {
         publications {
             create("mavenJava", MavenPublication::class) {
                 pom {
-                    name.set("QUP ${project.displayName.uppercase()}") // TODO: read a property with a real name
+                    name.set("parsers ${project.displayName.uppercase()}") // TODO: read a property with a real name
                     packaging = "jar"
                     description.set(project.description)
-                    url.set("https://github.com/QuiltMC/qup")
+                    url.set("https://github.com/QuiltMC/parsers")
 
                     scm {
-                        connection.set("scm:git:https://github.com/QuiltMC/qup.git")
-                        developerConnection.set("scm:git:ssh:git@github.com:QuiltMC/qup.git")
-                        url.set("https://github.com/QuiltMC/qup")
+                        connection.set("scm:git:https://github.com/QuiltMC/parsers.git")
+                        developerConnection.set("scm:git:ssh:git@github.com:QuiltMC/parsers.git")
+                        url.set("https://github.com/QuiltMC/parsers")
                     }
 
                     licenses {
