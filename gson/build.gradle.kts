@@ -17,7 +17,11 @@ java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
 }
-
+tasks.jar {
+    manifest {
+        attributes(Pair("Automatic-Module-Name", "org.quiltmc.parsers.gson"))
+    }
+}
 dependencies {
     api(project(":json"))
     api("com.google.code.gson:gson:2.10.1")

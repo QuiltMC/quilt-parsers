@@ -18,6 +18,11 @@ java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }
+tasks.jar {
+    manifest {
+        attributes(Pair("Automatic-Module-Name", "org.quiltmc.parsers.json"))
+    }
+}
 dependencies {
     implementation("org.jetbrains:annotations:24.0.1")
 }
