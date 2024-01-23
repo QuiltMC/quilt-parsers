@@ -46,71 +46,132 @@ public class GsonReader extends JsonReader {
         return delegate;
     }
 
+    @FunctionalInterface
+    private interface DelegateAction {
+        void call() throws IOException;
+    }
+
+    @FunctionalInterface
+    private interface DelegateFunction<T> {
+        T call() throws IOException;
+    }
+
+    // these next interfaces are not strictly necessary, but they avoid boxing
+    // (if Java let primitives be generic parameters like C#, these wouldn't be needed.
+    //  Project Panama when)
+
+    @FunctionalInterface
+    private interface DelegateBooleanFunction {
+        boolean call() throws IOException;
+    }
+
+    @FunctionalInterface
+    private interface DelegateIntFunction {
+        int call() throws IOException;
+    }
+
+    @FunctionalInterface
+    private interface DelegateLongFunction {
+        long call() throws IOException;
+    }
+
+    @FunctionalInterface
+    private interface DelegateDoubleFunction {
+        double call() throws IOException;
+    }
+
+    private void rethrowGsonExceptions(DelegateAction action) throws IOException {
+        try {
+            action.call();
+        } catch (MalformedSyntaxException | FormatViolationException e) {
+            throw new JsonSyntaxException(e.getMessage(), e);
+        } catch (ParseException e) {
+            throw new JsonParseException(e.getMessage(), e);
+        }
+    }
+
+    private <T> T rethrowGsonExceptions(DelegateFunction<T> func) throws IOException {
+        try {
+            return func.call();
+        } catch (MalformedSyntaxException | FormatViolationException e) {
+            throw new JsonSyntaxException(e.getMessage(), e);
+        } catch (ParseException e) {
+            throw new JsonParseException(e.getMessage(), e);
+        }
+    }
+
+    private boolean rethrowGsonExceptions(DelegateBooleanFunction func) throws IOException
+    {
+        try {
+            return func.call();
+        } catch (MalformedSyntaxException | FormatViolationException e) {
+            throw new JsonSyntaxException(e.getMessage(), e);
+        } catch (ParseException e) {
+            throw new JsonParseException(e.getMessage(), e);
+        }
+    }
+
+    private int rethrowGsonExceptions(DelegateIntFunction func) throws IOException
+    {
+        try {
+            return func.call();
+        } catch (MalformedSyntaxException | FormatViolationException e) {
+            throw new JsonSyntaxException(e.getMessage(), e);
+        } catch (ParseException e) {
+            throw new JsonParseException(e.getMessage(), e);
+        }
+    }
+
+    private long rethrowGsonExceptions(DelegateLongFunction func) throws IOException
+    {
+        try {
+            return func.call();
+        } catch (MalformedSyntaxException | FormatViolationException e) {
+            throw new JsonSyntaxException(e.getMessage(), e);
+        } catch (ParseException e) {
+            throw new JsonParseException(e.getMessage(), e);
+        }
+    }
+
+    private double rethrowGsonExceptions(DelegateDoubleFunction func) throws IOException
+    {
+        try {
+            return func.call();
+        } catch (MalformedSyntaxException | FormatViolationException e) {
+            throw new JsonSyntaxException(e.getMessage(), e);
+        } catch (ParseException e) {
+            throw new JsonParseException(e.getMessage(), e);
+        }
+    }
+
     @Override
     public void beginArray() throws IOException {
-        try {
-            delegate.beginArray();
-        } catch (MalformedSyntaxException | FormatViolationException e) {
-            throw new JsonSyntaxException(e.getMessage(), e.getCause());
-        } catch (ParseException e) {
-            throw new JsonParseException(e.getMessage(), e.getCause());
-        }
+        rethrowGsonExceptions(delegate::beginArray);
     }
 
     @Override
     public void endArray() throws IOException {
-        try {
-            delegate.endArray();
-        } catch (MalformedSyntaxException | FormatViolationException e) {
-            throw new JsonSyntaxException(e.getMessage(), e.getCause());
-        } catch (ParseException e) {
-            throw new JsonParseException(e.getMessage(), e.getCause());
-        }
+        rethrowGsonExceptions(delegate::endArray);
     }
 
     @Override
     public void beginObject() throws IOException {
-        try {
-            delegate.beginObject();
-        } catch (MalformedSyntaxException | FormatViolationException e) {
-            throw new JsonSyntaxException(e.getMessage(), e.getCause());
-        } catch (ParseException e) {
-            throw new JsonParseException(e.getMessage(), e.getCause());
-        }
+        rethrowGsonExceptions(delegate::beginObject);
     }
 
     @Override
     public void endObject() throws IOException {
-        try {
-            delegate.endObject();
-        } catch (MalformedSyntaxException | FormatViolationException e) {
-            throw new JsonSyntaxException(e.getMessage(), e.getCause());
-        } catch (ParseException e) {
-            throw new JsonParseException(e.getMessage(), e.getCause());
-        }
+        rethrowGsonExceptions(delegate::endObject);
     }
 
     @Override
     public boolean hasNext() throws IOException {
-        try {
-            return delegate.hasNext();
-        } catch (MalformedSyntaxException | FormatViolationException e) {
-            throw new JsonSyntaxException(e.getMessage(), e.getCause());
-        } catch (ParseException e) {
-            throw new JsonParseException(e.getMessage(), e.getCause());
-        }
+        return rethrowGsonExceptions(delegate::hasNext);
     }
 
     @Override
     public JsonToken peek() throws IOException {
-        org.quiltmc.parsers.json.JsonToken quiltToken;
-        try {
-            quiltToken = delegate.peek();
-        } catch (MalformedSyntaxException | FormatViolationException e) {
-            throw new JsonSyntaxException(e.getMessage(), e.getCause());
-        } catch (ParseException e) {
-            throw new JsonParseException(e.getMessage(), e.getCause());
-        }
+        var quiltToken = rethrowGsonExceptions(delegate::peek);
 
         switch (quiltToken) {
             case BEGIN_ARRAY:
@@ -140,79 +201,37 @@ public class GsonReader extends JsonReader {
 
     @Override
     public String nextName() throws IOException {
-        try {
-            return delegate.nextName();
-        } catch (MalformedSyntaxException | FormatViolationException e) {
-            throw new JsonSyntaxException(e.getMessage(), e.getCause());
-        } catch (ParseException e) {
-            throw new JsonParseException(e.getMessage(), e.getCause());
-        }
+        return rethrowGsonExceptions(delegate::nextName);
     }
 
     @Override
     public String nextString() throws IOException {
-        try {
-            return delegate.nextString();
-        } catch (MalformedSyntaxException | FormatViolationException e) {
-            throw new JsonSyntaxException(e.getMessage(), e.getCause());
-        } catch (ParseException e) {
-            throw new JsonParseException(e.getMessage(), e.getCause());
-        }
+        return rethrowGsonExceptions(delegate::nextString);
     }
 
     @Override
     public boolean nextBoolean() throws IOException {
-        try {
-            return delegate.nextBoolean();
-        } catch (MalformedSyntaxException | FormatViolationException e) {
-            throw new JsonSyntaxException(e.getMessage(), e.getCause());
-        } catch (ParseException e) {
-            throw new JsonParseException(e.getMessage(), e.getCause());
-        }
+        return rethrowGsonExceptions(delegate::nextBoolean);
     }
 
     @Override
     public void nextNull() throws IOException {
-        try {
-            delegate.nextNull();
-        } catch (MalformedSyntaxException | FormatViolationException e) {
-            throw new JsonSyntaxException(e.getMessage(), e.getCause());
-        } catch (ParseException e) {
-            throw new JsonParseException(e.getMessage(), e.getCause());
-        }
+        rethrowGsonExceptions(delegate::nextNull);
     }
 
     @Override
     public double nextDouble() throws IOException {
-        try {
-            return delegate.nextDouble();
-        } catch (MalformedSyntaxException | FormatViolationException e) {
-            throw new JsonSyntaxException(e.getMessage(), e.getCause());
-        } catch (ParseException e) {
-            throw new JsonParseException(e.getMessage(), e.getCause());
-        }
+        return rethrowGsonExceptions(delegate::nextDouble);
     }
 
     @Override
     public long nextLong() throws IOException {
-        try {
-            return delegate.nextLong();
-        } catch (MalformedSyntaxException | FormatViolationException e) {
-            throw new JsonSyntaxException(e.getMessage(), e.getCause());
-        } catch (ParseException e) {
-            throw new JsonParseException(e.getMessage(), e.getCause());
-        }
+        return rethrowGsonExceptions(delegate::nextLong);
     }
 
     @Override
     public int nextInt() throws IOException {
-        try {
-            return delegate.nextInt();
-        } catch (MalformedSyntaxException | FormatViolationException e) {
-            throw new JsonSyntaxException(e.getMessage(), e.getCause());
-        } catch (ParseException e) {
-            throw new JsonParseException(e.getMessage(), e.getCause());
-        }
+        return rethrowGsonExceptions(delegate::nextInt);
     }
 
     @Override
@@ -223,13 +242,7 @@ public class GsonReader extends JsonReader {
 
     @Override
     public void skipValue() throws IOException {
-        try {
-            delegate.skipValue();
-        } catch (MalformedSyntaxException | FormatViolationException e) {
-            throw new JsonSyntaxException(e.getMessage(), e.getCause());
-        } catch (ParseException e) {
-            throw new JsonParseException(e.getMessage(), e.getCause());
-        }
+        rethrowGsonExceptions(delegate::skipValue);
     }
 
     @Override
