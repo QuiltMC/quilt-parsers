@@ -21,8 +21,7 @@ package org.quiltmc.parsers.json;
  */
 public enum JsonFormat {
     /**
-     * The standard, (<a href="http://www.ietf.org/rfc/rfc7159.txt">RFC 7159</a>) JSON.
-     *  JSON5</a> or strict JSON
+     * The standard, <a href="http://www.ietf.org/rfc/rfc7159.txt">RFC 7159</a> JSON.
      */
     JSON,
     /**

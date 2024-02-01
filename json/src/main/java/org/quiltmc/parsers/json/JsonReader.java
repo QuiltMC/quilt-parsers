@@ -86,7 +86,7 @@ import java.util.Objects;
  *   {
  *   /*
  *    * Look mom, block comments!
- *   *\/
+ *    *\/
  *     "id": 912345678902,
  *     "text": "@json_newb just use JsonReader!",
  *     "geo": [-Infinity, NaN], // wow, broken floating point types!
