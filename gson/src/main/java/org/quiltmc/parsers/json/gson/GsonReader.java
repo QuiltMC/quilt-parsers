@@ -47,46 +47,19 @@ public class GsonReader extends JsonReader {
     }
 
     @FunctionalInterface
-    private interface DelegateAction {
-        void call() throws IOException;
-    }
-
-    @FunctionalInterface
     private interface DelegateFunction<T> {
         T call() throws IOException;
     }
 
-    // these next interfaces are not strictly necessary, but they avoid boxing
-    // (if Java let primitives be generic parameters like C#, these wouldn't be needed.
-    //  Project Panama when)
-
     @FunctionalInterface
-    private interface DelegateBooleanFunction {
-        boolean call() throws IOException;
-    }
+    private interface DelegateAction extends DelegateFunction<Void> {
+        void run() throws IOException;
 
-    @FunctionalInterface
-    private interface DelegateIntFunction {
-        int call() throws IOException;
-    }
-
-    @FunctionalInterface
-    private interface DelegateLongFunction {
-        long call() throws IOException;
-    }
-
-    @FunctionalInterface
-    private interface DelegateDoubleFunction {
-        double call() throws IOException;
-    }
-
-    private void rethrowGsonExceptions(DelegateAction action) throws IOException {
-        try {
-            action.call();
-        } catch (MalformedSyntaxException | FormatViolationException e) {
-            throw new JsonSyntaxException(e.getMessage(), e);
-        } catch (ParseException e) {
-            throw new JsonParseException(e.getMessage(), e);
+        @Override
+        default Void call() throws IOException
+        {
+            run();
+            return null;
         }
     }
 
@@ -100,68 +73,28 @@ public class GsonReader extends JsonReader {
         }
     }
 
-    private boolean rethrowGsonExceptions(DelegateBooleanFunction func) throws IOException
-    {
-        try {
-            return func.call();
-        } catch (MalformedSyntaxException | FormatViolationException e) {
-            throw new JsonSyntaxException(e.getMessage(), e);
-        } catch (ParseException e) {
-            throw new JsonParseException(e.getMessage(), e);
-        }
-    }
-
-    private int rethrowGsonExceptions(DelegateIntFunction func) throws IOException
-    {
-        try {
-            return func.call();
-        } catch (MalformedSyntaxException | FormatViolationException e) {
-            throw new JsonSyntaxException(e.getMessage(), e);
-        } catch (ParseException e) {
-            throw new JsonParseException(e.getMessage(), e);
-        }
-    }
-
-    private long rethrowGsonExceptions(DelegateLongFunction func) throws IOException
-    {
-        try {
-            return func.call();
-        } catch (MalformedSyntaxException | FormatViolationException e) {
-            throw new JsonSyntaxException(e.getMessage(), e);
-        } catch (ParseException e) {
-            throw new JsonParseException(e.getMessage(), e);
-        }
-    }
-
-    private double rethrowGsonExceptions(DelegateDoubleFunction func) throws IOException
-    {
-        try {
-            return func.call();
-        } catch (MalformedSyntaxException | FormatViolationException e) {
-            throw new JsonSyntaxException(e.getMessage(), e);
-        } catch (ParseException e) {
-            throw new JsonParseException(e.getMessage(), e);
-        }
+    private void rethrowGsonExceptionsVoid(DelegateAction action) throws IOException {
+        rethrowGsonExceptions(action);
     }
 
     @Override
     public void beginArray() throws IOException {
-        rethrowGsonExceptions(delegate::beginArray);
+        rethrowGsonExceptionsVoid(delegate::beginArray);
     }
 
     @Override
     public void endArray() throws IOException {
-        rethrowGsonExceptions(delegate::endArray);
+        rethrowGsonExceptionsVoid(delegate::endArray);
     }
 
     @Override
     public void beginObject() throws IOException {
-        rethrowGsonExceptions(delegate::beginObject);
+        rethrowGsonExceptionsVoid(delegate::beginObject);
     }
 
     @Override
     public void endObject() throws IOException {
-        rethrowGsonExceptions(delegate::endObject);
+        rethrowGsonExceptionsVoid(delegate::endObject);
     }
 
     @Override
@@ -216,7 +149,7 @@ public class GsonReader extends JsonReader {
 
     @Override
     public void nextNull() throws IOException {
-        rethrowGsonExceptions(delegate::nextNull);
+        rethrowGsonExceptionsVoid(delegate::nextNull);
     }
 
     @Override
@@ -242,7 +175,7 @@ public class GsonReader extends JsonReader {
 
     @Override
     public void skipValue() throws IOException {
-        rethrowGsonExceptions(delegate::skipValue);
+        rethrowGsonExceptionsVoid(delegate::skipValue);
     }
 
     @Override
