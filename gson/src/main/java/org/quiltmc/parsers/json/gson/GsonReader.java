@@ -16,8 +16,13 @@
 
 package org.quiltmc.parsers.json.gson;
 
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
+import org.quiltmc.parsers.json.FormatViolationException;
+import org.quiltmc.parsers.json.MalformedSyntaxException;
+import org.quiltmc.parsers.json.ParseException;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -27,6 +32,7 @@ import java.io.Reader;
  */
 public class GsonReader extends JsonReader {
     private final org.quiltmc.parsers.json.JsonReader delegate;
+
     /**
      * Creates a new instance that reads a JSON-encoded stream from {@code in}.
      *
@@ -40,34 +46,67 @@ public class GsonReader extends JsonReader {
         return delegate;
     }
 
+    @FunctionalInterface
+    private interface DelegateFunction<T> {
+        T call() throws IOException;
+    }
+
+    @FunctionalInterface
+    private interface DelegateAction extends DelegateFunction<Void> {
+        void run() throws IOException;
+
+        @Override
+        default Void call() throws IOException
+        {
+            run();
+            return null;
+        }
+    }
+
+    private <T> T rethrowGsonExceptions(DelegateFunction<T> func) throws IOException {
+        try {
+            return func.call();
+        } catch (MalformedSyntaxException | FormatViolationException e) {
+            throw new JsonSyntaxException(e.getMessage(), e);
+        } catch (ParseException e) {
+            throw new JsonParseException(e.getMessage(), e);
+        }
+    }
+
+    private void rethrowGsonExceptionsVoid(DelegateAction action) throws IOException {
+        rethrowGsonExceptions(action);
+    }
+
     @Override
     public void beginArray() throws IOException {
-        delegate.beginArray();
+        rethrowGsonExceptionsVoid(delegate::beginArray);
     }
 
     @Override
     public void endArray() throws IOException {
-        delegate.endArray();
+        rethrowGsonExceptionsVoid(delegate::endArray);
     }
 
     @Override
     public void beginObject() throws IOException {
-        delegate.beginObject();
+        rethrowGsonExceptionsVoid(delegate::beginObject);
     }
 
     @Override
     public void endObject() throws IOException {
-        delegate.endObject();
+        rethrowGsonExceptionsVoid(delegate::endObject);
     }
 
     @Override
     public boolean hasNext() throws IOException {
-        return delegate.hasNext();
+        return rethrowGsonExceptions(delegate::hasNext);
     }
 
     @Override
     public JsonToken peek() throws IOException {
-        switch (delegate.peek()) {
+        var quiltToken = rethrowGsonExceptions(delegate::peek);
+
+        switch (quiltToken) {
             case BEGIN_ARRAY:
                 return JsonToken.BEGIN_ARRAY;
             case END_ARRAY:
@@ -89,43 +128,43 @@ public class GsonReader extends JsonReader {
             case END_DOCUMENT:
                 return JsonToken.END_DOCUMENT;
             default:
-                throw new IllegalArgumentException();
+                throw new IllegalStateException("Delegate returned unrecognized token " + quiltToken);
         }
     }
 
     @Override
     public String nextName() throws IOException {
-        return delegate.nextName();
+        return rethrowGsonExceptions(delegate::nextName);
     }
 
     @Override
     public String nextString() throws IOException {
-        return delegate.nextString();
+        return rethrowGsonExceptions(delegate::nextString);
     }
 
     @Override
     public boolean nextBoolean() throws IOException {
-        return delegate.nextBoolean();
+        return rethrowGsonExceptions(delegate::nextBoolean);
     }
 
     @Override
     public void nextNull() throws IOException {
-        delegate.nextNull();
+        rethrowGsonExceptionsVoid(delegate::nextNull);
     }
 
     @Override
     public double nextDouble() throws IOException {
-        return delegate.nextDouble();
+        return rethrowGsonExceptions(delegate::nextDouble);
     }
 
     @Override
     public long nextLong() throws IOException {
-        return delegate.nextLong();
+        return rethrowGsonExceptions(delegate::nextLong);
     }
 
     @Override
     public int nextInt() throws IOException {
-        return delegate.nextInt();
+        return rethrowGsonExceptions(delegate::nextInt);
     }
 
     @Override
@@ -136,7 +175,7 @@ public class GsonReader extends JsonReader {
 
     @Override
     public void skipValue() throws IOException {
-        delegate.skipValue();
+        rethrowGsonExceptionsVoid(delegate::skipValue);
     }
 
     @Override
