@@ -694,10 +694,6 @@ public final class JsonWriter implements Closeable, Flushable {
 			out.write('\"');
 		}
 
-		if (!escapeQuotes) {
-			replacements['\"'] = null;
-		}
-
 		int last = 0;
 		int length = value.length();
 
@@ -705,6 +701,9 @@ public final class JsonWriter implements Closeable, Flushable {
 			char c = value.charAt(i);
 			String replacement;
 			if (c < 128) {
+				if (!escapeQuotes && c == '"') {
+					continue;
+				}
 				replacement = replacements[c];
 				if (replacement == null) {
 					continue;
